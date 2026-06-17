@@ -191,7 +191,7 @@ function StepWelcome({ onRegister, onLogin }: { onRegister: () => void; onLogin:
 // ─── ONBOARDING: REGISTRO ────────────────────────────────────────────────────
 function StepRegister({ onBack, onNext }: {
   onBack: () => void
-  onNext: (data: { nombre: string; apellido: string; telefono: string; email: string; password: string; curp: string; municipio: string; estado: string; banco: string; clabe: string; titular: string }) => void
+  onNext: (data: { nombre: string; apellido: string; telefono: string; email: string; password: string; curp: string; calle: string; numero: string; colonia: string; cp: string; municipio: string; estado: string; banco: string; clabe: string; titular: string }) => void
 }) {
   const [form, setForm] = useState({
     nombre: "", apellido: "", curp: "", telefono: "", email: "",
