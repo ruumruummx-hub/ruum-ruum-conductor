@@ -191,9 +191,14 @@ function StepWelcome({ onRegister, onLogin }: { onRegister: () => void; onLogin:
 // ─── ONBOARDING: REGISTRO ────────────────────────────────────────────────────
 function StepRegister({ onBack, onNext }: {
   onBack: () => void
-  onNext: (data: { nombre: string; apellido: string; telefono: string; email: string; password: string }) => void
+  onNext: (data: { nombre: string; apellido: string; telefono: string; email: string; password: string; curp: string; municipio: string; estado: string; banco: string; clabe: string; titular: string }) => void
 }) {
-  const [form, setForm] = useState({ nombre: "", apellido: "", telefono: "", email: "", password: "", confirmar: "" })
+  const [form, setForm] = useState({
+    nombre: "", apellido: "", curp: "", telefono: "", email: "",
+    password: "", confirmar: "",
+    municipio: "", estado: "",
+    banco: "", clabe: "", titular: "",
+  })
   const [show, setShow] = useState(false)
   const [showC, setShowC] = useState(false)
   const [errors, setErrors] = useState<Partial<typeof form>>({})
@@ -212,9 +217,13 @@ function StepRegister({ onBack, onNext }: {
     if (!form.email)            e.email     = "Requerido"
     if (form.password.length < 8) e.password = "Mínimo 8 caracteres"
     if (form.password !== form.confirmar) e.confirmar = "Las contraseñas no coinciden"
+    if (!form.municipio.trim()) e.municipio = "Requerido"
+    if (!form.estado.trim())    e.estado    = "Requerido"
     setErrors(e)
     return Object.keys(e).length === 0
   }
+
+  const sec = "text-xs font-bold text-slate-500 uppercase tracking-wide border-b border-slate-100 pb-2 mb-3"
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -223,61 +232,125 @@ function StepRegister({ onBack, onNext }: {
         <h2 className="text-2xl font-black text-white">Crear cuenta</h2>
         <p className="text-white/50 text-sm mt-1">Empieza tu registro como conductor</p>
       </div>
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <OLabel req>Nombre(s)</OLabel>
-            <input type="text" value={form.nombre} placeholder="NOMBRE(S)"
-              onChange={e => set("nombre", e.target.value.toUpperCase())} className={inputCls(errors.nombre)} />
-            <OErr msg={errors.nombre} />
-          </div>
-          <div>
-            <OLabel req>Apellido(s)</OLabel>
-            <input type="text" value={form.apellido} placeholder="APELLIDO(S)"
-              onChange={e => set("apellido", e.target.value.toUpperCase())} className={inputCls(errors.apellido)} />
-            <OErr msg={errors.apellido} />
-          </div>
-        </div>
+
+      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+
+        {/* ── Datos personales ── */}
         <div>
-          <OLabel req>Teléfono celular</OLabel>
-          <div className="flex gap-2">
-            <div className="px-3 py-3 border border-slate-300 rounded-xl text-sm text-slate-600 bg-slate-50 whitespace-nowrap">🇲🇽 +52</div>
-            <input type="tel" value={form.telefono} placeholder="55-0000-0000"
-              onChange={e => set("telefono", fmtTel(e.target.value))} className={`flex-1 ${inputCls(errors.telefono)}`} />
+          <p className={sec}>👤 Datos personales</p>
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <OLabel req>Nombre(s)</OLabel>
+                <input type="text" value={form.nombre} placeholder="NOMBRE(S)"
+                  onChange={e => set("nombre", e.target.value.toUpperCase())} className={inputCls(errors.nombre)} />
+                <OErr msg={errors.nombre} />
+              </div>
+              <div>
+                <OLabel req>Apellido(s)</OLabel>
+                <input type="text" value={form.apellido} placeholder="APELLIDO(S)"
+                  onChange={e => set("apellido", e.target.value.toUpperCase())} className={inputCls(errors.apellido)} />
+                <OErr msg={errors.apellido} />
+              </div>
+            </div>
+
+            <div>
+              <OLabel>CURP</OLabel>
+              <input type="text" value={form.curp} placeholder="18 CARACTERES" maxLength={18}
+                onChange={e => set("curp", e.target.value.toUpperCase())} className={inputCls()} />
+            </div>
+
+            <div>
+              <OLabel req>Teléfono celular</OLabel>
+              <div className="flex gap-2">
+                <div className="px-3 py-3 border border-slate-300 rounded-xl text-sm text-slate-600 bg-slate-50 whitespace-nowrap">🇲🇽 +52</div>
+                <input type="tel" value={form.telefono} placeholder="55-0000-0000"
+                  onChange={e => set("telefono", fmtTel(e.target.value))} className={`flex-1 ${inputCls(errors.telefono)}`} />
+              </div>
+              <OErr msg={errors.telefono} />
+            </div>
+
+            <div>
+              <OLabel req>Correo electrónico</OLabel>
+              <input type="email" value={form.email} placeholder="correo@ejemplo.com"
+                onChange={e => set("email", e.target.value)} className={inputCls(errors.email)} />
+              <OErr msg={errors.email} />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <OLabel req>Municipio / Alcaldía</OLabel>
+                <input type="text" value={form.municipio} placeholder="MUNICIPIO"
+                  onChange={e => set("municipio", e.target.value.toUpperCase())} className={inputCls(errors.municipio)} />
+                <OErr msg={errors.municipio} />
+              </div>
+              <div>
+                <OLabel req>Estado</OLabel>
+                <input type="text" value={form.estado} placeholder="ESTADO"
+                  onChange={e => set("estado", e.target.value.toUpperCase())} className={inputCls(errors.estado)} />
+                <OErr msg={errors.estado} />
+              </div>
+            </div>
           </div>
-          <OErr msg={errors.telefono} />
         </div>
+
+        {/* ── Contraseña ── */}
         <div>
-          <OLabel req>Correo electrónico</OLabel>
-          <input type="email" value={form.email} placeholder="correo@ejemplo.com"
-            onChange={e => set("email", e.target.value)} className={inputCls(errors.email)} />
-          <OErr msg={errors.email} />
-        </div>
-        <div>
-          <OLabel req>Contraseña</OLabel>
-          <div className="relative">
-            <input type={show ? "text" : "password"} value={form.password} placeholder="Mínimo 8 caracteres"
-              onChange={e => set("password", e.target.value)} className={inputCls(errors.password)} />
-            <button type="button" onClick={() => setShow(s => !s)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">
-              {show ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-            </button>
+          <p className={sec}>🔒 Acceso a la cuenta</p>
+          <div className="space-y-3">
+            <div>
+              <OLabel req>Contraseña</OLabel>
+              <div className="relative">
+                <input type={show ? "text" : "password"} value={form.password} placeholder="Mínimo 8 caracteres"
+                  onChange={e => set("password", e.target.value)} className={inputCls(errors.password)} />
+                <button type="button" onClick={() => setShow(s => !s)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">
+                  {show ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              <OErr msg={errors.password} />
+            </div>
+            <div>
+              <OLabel req>Confirmar contraseña</OLabel>
+              <div className="relative">
+                <input type={showC ? "text" : "password"} value={form.confirmar} placeholder="Repite tu contraseña"
+                  onChange={e => set("confirmar", e.target.value)} className={inputCls(errors.confirmar)} />
+                <button type="button" onClick={() => setShowC(s => !s)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">
+                  {showC ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              <OErr msg={errors.confirmar} />
+            </div>
           </div>
-          <OErr msg={errors.password} />
         </div>
+
+        {/* ── Cuenta bancaria ── */}
         <div>
-          <OLabel req>Confirmar contraseña</OLabel>
-          <div className="relative">
-            <input type={showC ? "text" : "password"} value={form.confirmar} placeholder="Repite tu contraseña"
-              onChange={e => set("confirmar", e.target.value)} className={inputCls(errors.confirmar)} />
-            <button type="button" onClick={() => setShowC(s => !s)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">
-              {showC ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-            </button>
+          <p className={sec}>🏦 Cuenta bancaria <span className="text-slate-400 font-normal normal-case">(opcional — puedes completarla después)</span></p>
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <OLabel>Banco</OLabel>
+                <input type="text" value={form.banco} placeholder="BBVA, SANTANDER..."
+                  onChange={e => set("banco", e.target.value.toUpperCase())} className={inputCls()} />
+              </div>
+              <div>
+                <OLabel>Titular de la cuenta</OLabel>
+                <input type="text" value={form.titular} placeholder="NOMBRE COMPLETO"
+                  onChange={e => set("titular", e.target.value.toUpperCase())} className={inputCls()} />
+              </div>
+            </div>
+            <div>
+              <OLabel>CLABE interbancaria</OLabel>
+              <input type="text" value={form.clabe} placeholder="18 DÍGITOS" maxLength={18}
+                onChange={e => set("clabe", e.target.value.replace(/\D/g,"").slice(0,18))} className={inputCls()} />
+            </div>
           </div>
-          <OErr msg={errors.confirmar} />
         </div>
+
       </div>
+
       <div className="p-6 border-t border-slate-100">
         <button onClick={() => { if (validate()) onNext(form) }}
           className="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl text-base hover:bg-slate-800 transition-all active:scale-95 flex items-center justify-center gap-2">
@@ -968,6 +1041,7 @@ export default function DriverApp() {
   const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>("welcome")
   const [registerData, setRegisterData] = useState<{
     nombre: string; apellido: string; telefono: string; email: string; password: string
+    curp: string; municipio: string; estado: string; banco: string; clabe: string; titular: string
   } | null>(null)
   const [legalLoading, setLegalLoading] = useState(false)
   const [conductorAuthId, setConductorAuthId] = useState<string | null>(null)
@@ -1069,6 +1143,12 @@ export default function DriverApp() {
         apellido:       registerData.apellido,
         telefono:       registerData.telefono,
         email:          registerData.email,
+        curp:           registerData.curp?.toUpperCase() || null,
+        municipio:      registerData.municipio?.toUpperCase() || null,
+        estado_geo:     registerData.estado?.toUpperCase() || null,
+        cuenta_banco:   registerData.banco?.toUpperCase() || null,
+        cuenta_clabe:   registerData.clabe || null,
+        cuenta_titular: registerData.titular?.toUpperCase() || null,
         disponibilidad: "No disponible",
         certificacion:  "Pendiente de validación",
         calificacion:   0,
