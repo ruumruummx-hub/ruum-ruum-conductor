@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Ruum Ruum Conductor | By MoviliaX",
-  description: "Panel móvil para conductores de Ruum Ruum"
+  description: "Aplicación para conductores certificados de Ruum Ruum by MoviliaX"
 };
 
 export default function RootLayout({

@@ -80,11 +80,11 @@ function cx(...classes: (string | false | undefined)[]) {
 
 // ─── ONBOARDING HELPERS ──────────────────────────────────────────────────────
 const inputCls = (err?: string) =>
-  `w-full border ${err ? "border-red-400 bg-red-50" : "border-slate-300"} rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-800 bg-white`
+  `w-full border ${err ? "border-red-400 bg-red-50" : "border-slate-300"} rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1565FF] bg-white`
 
 function OLabel({ children, req }: { children: React.ReactNode; req?: boolean }) {
   return (
-    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wide">
+    <label className="block text-xs font-semibold text-[#6B7280] mb-1 uppercase tracking-wide">
       {children}{req && <span className="text-red-500 ml-0.5">*</span>}
     </label>
   )
@@ -109,18 +109,18 @@ function UploadBox({ label, accept = "image/*,.pdf", value, onChange, error }: {
       <div
         onClick={() => ref.current?.click()}
         className={`relative border-2 border-dashed rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer transition-colors min-h-[90px] ${
-          error ? "border-red-400 bg-red-50" : value ? "border-green-400 bg-green-50" : "border-slate-300 hover:border-slate-400 bg-slate-50"
+          error ? "border-red-400 bg-red-50" : value ? "border-[#00C853] bg-[#F0FFF6]" : "border-slate-300 hover:border-slate-400 bg-[#F8FAFC]"
         }`}
       >
         {value ? (
           <div className="flex items-center gap-3 w-full">
             {value.preview
               ? <img src={value.preview} alt="" className="w-14 h-14 object-cover rounded-lg" />
-              : <div className="w-14 h-14 bg-slate-200 rounded-lg flex items-center justify-center"><FileText className="w-5 h-5 text-slate-500" /></div>
+              : <div className="w-14 h-14 bg-slate-200 rounded-lg flex items-center justify-center"><FileText className="w-5 h-5 text-[#6B7280]" /></div>
             }
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-green-700 truncate">{value.file.name}</p>
-              <p className="text-xs text-slate-400">{(value.file.size / 1024).toFixed(0)} KB</p>
+              <p className="text-xs font-semibold text-[#008F3A] truncate">{value.file.name}</p>
+              <p className="text-xs text-[#94A3B8]">{(value.file.size / 1024).toFixed(0)} KB</p>
             </div>
             <button onClick={e => { e.stopPropagation(); onChange(null) }}
               className="w-7 h-7 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -129,8 +129,8 @@ function UploadBox({ label, accept = "image/*,.pdf", value, onChange, error }: {
           </div>
         ) : (
           <>
-            <Upload className="w-5 h-5 text-slate-400 mb-1" />
-            <p className="text-xs text-slate-500 text-center">Toca para subir<br /><span className="text-slate-400">JPG, PNG o PDF</span></p>
+            <Upload className="w-5 h-5 text-[#94A3B8] mb-1" />
+            <p className="text-xs text-[#6B7280] text-center">Toca para subir<br /><span className="text-[#94A3B8]">JPG, PNG o PDF</span></p>
           </>
         )}
         <input ref={ref} type="file" accept={accept} className="hidden"
@@ -144,7 +144,7 @@ function UploadBox({ label, accept = "image/*,.pdf", value, onChange, error }: {
 // ─── ONBOARDING: BIENVENIDA ──────────────────────────────────────────────────
 function StepWelcome({ onRegister, onLogin }: { onRegister: () => void; onLogin: () => void }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-[#0A1F44] via-[#0B2B5F] to-[#031225] flex flex-col">
       <div className="flex-1 flex flex-col items-center justify-center px-8 text-center py-12">
         <div className="w-24 h-24 bg-white/10 rounded-3xl flex items-center justify-center mb-6 shadow-2xl">
           <span className="text-5xl">🚘</span>
@@ -176,11 +176,11 @@ function StepWelcome({ onRegister, onLogin }: { onRegister: () => void; onLogin:
       </div>
       <div className="px-8 pb-12 space-y-3">
         <button onClick={onRegister}
-          className="w-full bg-white text-slate-900 font-bold py-4 rounded-2xl text-base shadow-xl hover:bg-white/90 transition-all active:scale-95">
+          className="w-full bg-[#1565FF] text-[#0A1F44] font-bold py-4 rounded-2xl text-base shadow-xl hover:brightness-95 transition-all active:scale-95">
           Registrarme como conductor
         </button>
         <button onClick={onLogin}
-          className="w-full border-2 border-white/30 text-white font-semibold py-4 rounded-2xl text-base hover:bg-white/5 transition-all active:scale-95">
+          className="w-full border-2 border-[#1565FF]/50 text-[#1565FF] font-semibold py-4 rounded-2xl text-base hover:bg-white/5 transition-all active:scale-95">
           Ya tengo cuenta
         </button>
       </div>
@@ -225,12 +225,12 @@ function StepRegister({ onBack, onNext }: {
     return Object.keys(e).length === 0
   }
 
-  const sec = "text-xs font-bold text-slate-500 uppercase tracking-wide border-b border-slate-100 pb-2 mb-3"
+  const sec = "text-xs font-bold text-[#6B7280] uppercase tracking-wide border-b border-slate-100 pb-2 mb-3"
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      <div className="bg-slate-900 px-6 pt-12 pb-6">
-        <button onClick={onBack} className="text-white/60 text-sm mb-4 flex items-center gap-1 hover:text-white">← Regresar</button>
+      <div className="bg-[#0A1F44] px-6 pt-12 pb-6">
+        <button onClick={onBack} className="text-[#FFFFFF]/60 text-sm mb-4 flex items-center gap-1 hover:text-[#1565FF]">← Regresar</button>
         <h2 className="text-2xl font-black text-white">Crear cuenta</h2>
         <p className="text-white/50 text-sm mt-1">Empieza tu registro como conductor</p>
       </div>
@@ -265,7 +265,7 @@ function StepRegister({ onBack, onNext }: {
             <div>
               <OLabel req>Teléfono celular</OLabel>
               <div className="flex gap-2">
-                <div className="px-3 py-3 border border-slate-300 rounded-xl text-sm text-slate-600 bg-slate-50 whitespace-nowrap">🇲🇽 +52</div>
+                <div className="px-3 py-3 border border-slate-300 rounded-xl text-sm text-slate-600 bg-[#F8FAFC] whitespace-nowrap">🇲🇽 +52</div>
                 <input type="tel" value={form.telefono} placeholder="55-0000-0000"
                   onChange={e => set("telefono", fmtTel(e.target.value))} className={`flex-1 ${inputCls(errors.telefono)}`} />
               </div>
@@ -338,7 +338,7 @@ function StepRegister({ onBack, onNext }: {
                 <input type={show ? "text" : "password"} value={form.password} placeholder="Mínimo 8 caracteres"
                   onChange={e => set("password", e.target.value)} className={inputCls(errors.password)} />
                 <button type="button" onClick={() => setShow(s => !s)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-slate-700">
                   {show ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
@@ -350,7 +350,7 @@ function StepRegister({ onBack, onNext }: {
                 <input type={showC ? "text" : "password"} value={form.confirmar} placeholder="Repite tu contraseña"
                   onChange={e => set("confirmar", e.target.value)} className={inputCls(errors.confirmar)} />
                 <button type="button" onClick={() => setShowC(s => !s)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-slate-700">
                   {showC ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
@@ -361,7 +361,7 @@ function StepRegister({ onBack, onNext }: {
 
         {/* ── Cuenta bancaria ── */}
         <div>
-          <p className={sec}>🏦 Cuenta bancaria <span className="text-slate-400 font-normal normal-case">(opcional — puedes completarla después)</span></p>
+          <p className={sec}>🏦 Cuenta bancaria <span className="text-[#94A3B8] font-normal normal-case">(opcional — puedes completarla después)</span></p>
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -387,7 +387,7 @@ function StepRegister({ onBack, onNext }: {
 
       <div className="p-6 border-t border-slate-100">
         <button onClick={() => { if (validate()) onNext(form) }}
-          className="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl text-base hover:bg-slate-800 transition-all active:scale-95 flex items-center justify-center gap-2">
+          className="w-full bg-[#1565FF] text-[#0A1F44] font-bold py-4 rounded-2xl text-base hover:brightness-95 transition-all active:scale-95 flex items-center justify-center gap-2">
           Continuar <ChevronRight className="w-5 h-5" />
         </button>
       </div>
@@ -422,8 +422,8 @@ function StepLogin({ onBack, onNext }: { onBack: () => void; onNext: () => void 
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      <div className="bg-slate-900 px-6 pt-12 pb-6">
-        <button onClick={onBack} className="text-white/60 text-sm mb-4 flex items-center gap-1 hover:text-white">← Regresar</button>
+      <div className="bg-[#0A1F44] px-6 pt-12 pb-6">
+        <button onClick={onBack} className="text-[#FFFFFF]/60 text-sm mb-4 flex items-center gap-1 hover:text-[#1565FF]">← Regresar</button>
         <h2 className="text-2xl font-black text-white">Iniciar sesión</h2>
         <p className="text-white/50 text-sm mt-1">Bienvenido de nuevo</p>
       </div>
@@ -440,22 +440,22 @@ function StepLogin({ onBack, onNext }: { onBack: () => void; onNext: () => void 
               onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
               onKeyDown={e => e.key === "Enter" && handleLogin()} className={inputCls()} />
             <button type="button" onClick={() => setShow(s => !s)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-slate-700">
               {show ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
           </div>
         </div>
         {error && <p className="text-xs text-red-500 font-medium">{error}</p>}
         {forgotSent
-          ? <p className="text-xs text-green-600 font-medium">✓ Te enviamos un correo para restablecer tu contraseña</p>
-          : <button onClick={handleForgot} className="text-sm text-blue-600 font-medium hover:underline">
+          ? <p className="text-xs text-[#00A846] font-medium">✓ Te enviamos un correo para restablecer tu contraseña</p>
+          : <button onClick={handleForgot} className="text-sm text-[#0A1F44] font-semibold hover:underline">
               ¿Olvidaste tu contraseña?
             </button>
         }
       </div>
       <div className="p-6 border-t border-slate-100">
         <button onClick={handleLogin} disabled={loading}
-          className="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl text-base hover:bg-slate-800 disabled:opacity-60 transition-all active:scale-95">
+          className="w-full bg-[#0A1F44] text-[#FFFFFF] font-bold py-4 rounded-2xl text-base hover:bg-[#2a2a2a] disabled:opacity-60 transition-all active:scale-95">
           {loading ? "Verificando..." : "Entrar"}
         </button>
       </div>
@@ -493,8 +493,8 @@ function StepDocumentos({ onBack, onNext }: { onBack: () => void; onNext: () => 
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      <div className="bg-slate-900 px-6 pt-12 pb-6">
-        <button onClick={onBack} className="text-white/60 text-sm mb-4 flex items-center gap-1 hover:text-white">← Regresar</button>
+      <div className="bg-[#0A1F44] px-6 pt-12 pb-6">
+        <button onClick={onBack} className="text-[#FFFFFF]/60 text-sm mb-4 flex items-center gap-1 hover:text-[#1565FF]">← Regresar</button>
         <h2 className="text-2xl font-black text-white">Tus documentos</h2>
         <p className="text-white/50 text-sm mt-1">Los revisaremos en menos de 24 horas</p>
       </div>
@@ -503,7 +503,7 @@ function StepDocumentos({ onBack, onNext }: { onBack: () => void; onNext: () => 
         <div className="space-y-3">
           <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
             <span className="text-lg">🪪</span>
-            <p className="text-sm font-bold text-slate-800">Licencia de conducir</p>
+            <p className="text-sm font-bold text-[#111827]">Licencia de conducir</p>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -542,7 +542,7 @@ function StepDocumentos({ onBack, onNext }: { onBack: () => void; onNext: () => 
         <div className="space-y-3">
           <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
             <span className="text-lg">🪪</span>
-            <p className="text-sm font-bold text-slate-800">Identificación oficial (INE)</p>
+            <p className="text-sm font-bold text-[#111827]">Identificación oficial (INE)</p>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -567,8 +567,8 @@ function StepDocumentos({ onBack, onNext }: { onBack: () => void; onNext: () => 
         <div className="space-y-3">
           <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
             <span className="text-lg">🏠</span>
-            <p className="text-sm font-bold text-slate-800">Comprobante de domicilio</p>
-            <span className="text-xs text-slate-400">(máx. 3 meses)</span>
+            <p className="text-sm font-bold text-[#111827]">Comprobante de domicilio</p>
+            <span className="text-xs text-[#94A3B8]">(máx. 3 meses)</span>
           </div>
           <UploadBox label="Foto o PDF del comprobante" accept="image/*,.pdf" value={domicilio}
             onChange={v => { setDomicilio(v); setErrors(er => ({ ...er, domicilio: "" })) }} error={errors.domicilio} />
@@ -579,7 +579,7 @@ function StepDocumentos({ onBack, onNext }: { onBack: () => void; onNext: () => 
       </div>
       <div className="p-6 border-t border-slate-100">
         <button onClick={() => { if (validate()) onNext() }}
-          className="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl text-base hover:bg-slate-800 transition-all active:scale-95 flex items-center justify-center gap-2">
+          className="w-full bg-[#1565FF] text-[#0A1F44] font-bold py-4 rounded-2xl text-base hover:brightness-95 transition-all active:scale-95 flex items-center justify-center gap-2">
           Continuar <ChevronRight className="w-5 h-5" />
         </button>
       </div>
@@ -601,8 +601,8 @@ function StepLegal({ onBack, onAccept, loading }: { onBack: () => void; onAccept
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      <div className="bg-slate-900 px-6 pt-12 pb-6">
-        <button onClick={onBack} className="text-white/60 text-sm mb-4 flex items-center gap-1 hover:text-white">← Regresar</button>
+      <div className="bg-[#0A1F44] px-6 pt-12 pb-6">
+        <button onClick={onBack} className="text-[#FFFFFF]/60 text-sm mb-4 flex items-center gap-1 hover:text-[#1565FF]">← Regresar</button>
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
             <Shield className="w-5 h-5 text-white" />
@@ -617,29 +617,29 @@ function StepLegal({ onBack, onAccept, loading }: { onBack: () => void; onAccept
         {items.map(item => (
           <button key={item.key} onClick={() => toggle(item.key)}
             className={`w-full text-left p-4 rounded-2xl border-2 transition-colors ${
-              checks[item.key] ? "border-green-500 bg-green-50" : "border-slate-200 bg-slate-50 hover:border-slate-300"
+              checks[item.key] ? "border-[#00C853] bg-[#F0FFF6]" : "border-[#E5E7EB] bg-[#F8FAFC] hover:border-slate-300"
             }`}>
             <div className="flex items-start gap-3">
               <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors ${
-                checks[item.key] ? "border-green-500 bg-green-500" : "border-slate-300 bg-white"
+                checks[item.key] ? "border-[#00C853] bg-[#00C853]" : "border-slate-300 bg-white"
               }`}>
                 {checks[item.key] && <Check className="w-3 h-3 text-white" />}
               </div>
               <div>
-                <p className={`text-sm font-bold mb-1 ${checks[item.key] ? "text-green-700" : "text-slate-800"}`}>{item.title}</p>
-                <p className="text-xs text-slate-500 leading-relaxed">{item.desc}</p>
+                <p className={`text-sm font-bold mb-1 ${checks[item.key] ? "text-[#008F3A]" : "text-[#111827]"}`}>{item.title}</p>
+                <p className="text-xs text-[#6B7280] leading-relaxed">{item.desc}</p>
               </div>
             </div>
           </button>
         ))}
-        {!allChecked && <p className="text-xs text-slate-400 text-center">Acepta todos los documentos para continuar</p>}
+        {!allChecked && <p className="text-xs text-[#94A3B8] text-center">Acepta todos los documentos para continuar</p>}
       </div>
       <div className="p-6 border-t border-slate-100">
         <button onClick={onAccept} disabled={!allChecked || loading}
           className={`w-full font-bold py-4 rounded-2xl text-base transition-all active:scale-95 ${
             allChecked && !loading
               ? "bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-200"
-              : "bg-slate-200 text-slate-400 cursor-not-allowed"
+              : "bg-slate-200 text-[#94A3B8] cursor-not-allowed"
           }`}>
           {loading ? "Creando cuenta..." : "✓ Activar mi cuenta"}
         </button>
@@ -654,20 +654,20 @@ function Header({ onOpenSettings, conductor }: {
   conductor: ConductorPerfil | null
 }) {
   return (
-    <header className="flex items-center justify-between bg-slate-900 px-5 py-3 flex-shrink-0">
+    <header className="flex items-center justify-between bg-[#0A1F44] px-5 py-3 flex-shrink-0">
       <div className="flex items-center gap-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
-          <span className="text-sm font-black text-white">R</span>
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#1565FF]">
+          <span className="text-xs font-black text-[#0A1F44]">RR</span>
         </div>
         <div>
           <p className="text-xs font-bold text-white leading-tight">Ruum Ruum</p>
-          <p className="text-[10px] text-slate-400 leading-tight">Conductor</p>
+          <p className="text-[10px] text-[#94A3B8] leading-tight">Conductor</p>
         </div>
       </div>
       <div className="flex items-center gap-3">
         {conductor && (
           <div className="flex items-center gap-1.5">
-            <Star className="h-3 w-3 text-amber-400 fill-amber-400" />
+            <Star className="h-3 w-3 text-[#FF6D00] fill-[#FF6D00]" />
             <span className="text-xs font-semibold text-white">{conductor.calificacion.toFixed(1)}</span>
           </div>
         )}
@@ -684,8 +684,8 @@ function StatusBadge({ disponibilidad }: { disponibilidad: string }) {
   const activo = disponibilidad === "Disponible"
   return (
     <span className={cx("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold",
-      activo ? "bg-green-100 text-green-700" : "bg-slate-200 text-slate-600")}>
-      <span className={cx("h-2 w-2 rounded-full", activo ? "animate-pulse bg-green-500" : "bg-slate-400")} />
+      activo ? "bg-[#E7F9EF] text-[#008F3A]" : "bg-slate-200 text-slate-600")}>
+      <span className={cx("h-2 w-2 rounded-full", activo ? "animate-pulse bg-[#00C853]" : "bg-slate-400")} />
       {disponibilidad}
     </span>
   );
@@ -705,59 +705,59 @@ function PanelView({ conductor, viajes, onDisponibilidadChange, cargando }: {
 
   return (
     <section className="fade-in p-5 pb-24">
-      <div className="mb-5 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="mb-5 rounded-xl border border-[#E5E7EB] bg-white p-4 shadow-sm">
         <div className="mb-3 flex items-center justify-between">
           <div>
             {cargando
               ? <div className="h-5 w-32 animate-pulse bg-slate-100 rounded mb-1" />
-              : <h2 className="text-lg font-bold text-slate-800">Hola, {conductor?.nombre ?? "Conductor"}</h2>
+              : <h2 className="text-lg font-bold text-[#111827]">Hola, {conductor?.nombre ?? "Conductor"}</h2>
             }
-            <p className="text-sm text-slate-500">Que tengas un excelente día de trabajo.</p>
+            <p className="text-sm text-[#6B7280]">Que tengas un excelente día de trabajo.</p>
           </div>
           {conductor && <StatusBadge disponibilidad={conductor.disponibilidad} />}
         </div>
-        <div className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 p-3">
+        <div className="flex items-center justify-between rounded-lg border border-slate-100 bg-[#F8FAFC] p-3">
           <span className="text-sm font-semibold text-slate-700">Recibir nuevos viajes</span>
           <label className="relative inline-flex cursor-pointer items-center">
             <input type="checkbox" className="peer sr-only" checked={disponible}
               onChange={e => onDisponibilidadChange(e.target.checked ? "Disponible" : "No disponible")} />
-            <span className="h-6 w-12 rounded-full bg-slate-300 transition-colors peer-checked:bg-green-500" />
-            <span className="absolute left-0.5 h-5 w-5 rounded-full border-2 border-slate-300 bg-white transition-transform peer-checked:translate-x-6 peer-checked:border-green-500" />
+            <span className="h-6 w-12 rounded-full bg-slate-300 transition-colors peer-checked:bg-[#00C853]" />
+            <span className="absolute left-0.5 h-5 w-5 rounded-full border-2 border-slate-300 bg-white transition-transform peer-checked:translate-x-6 peer-checked:border-[#00C853]" />
           </label>
         </div>
       </div>
       <h3 className="mb-3 text-sm font-bold text-slate-700">Resumen de esta semana</h3>
       <div className="mb-5 grid grid-cols-2 gap-3">
-        <div className="rounded-xl bg-blue-600 p-4 text-white shadow-md">
-          <p className="mb-1 text-xs text-blue-100">Tus viajes</p>
-          {cargando ? <div className="h-8 w-12 animate-pulse bg-blue-500 rounded" />
+        <div className="rounded-xl bg-[#1565FF] p-4 text-[#0A1F44] shadow-md">
+          <p className="mb-1 text-xs text-[#0A1F44]/70">Tus viajes</p>
+          {cargando ? <div className="h-8 w-12 animate-pulse bg-[#1565FF]/50 rounded" />
             : <p className="text-2xl font-bold">{viajes.length}</p>}
-          <p className="mt-1 text-[10px] text-blue-200">{viajesCompletados} completados</p>
+          <p className="mt-1 text-[10px] text-[#0A1F44]/60">{viajesCompletados} completados</p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <p className="mb-1 text-xs text-slate-500">Ganancia estimada</p>
+        <div className="rounded-xl border border-[#E5E7EB] bg-white p-4 shadow-sm">
+          <p className="mb-1 text-xs text-[#6B7280]">Ganancia estimada</p>
           {cargando ? <div className="h-8 w-20 animate-pulse bg-slate-100 rounded" />
-            : <p className="text-2xl font-bold text-slate-800">${gananciasSemana.toLocaleString()}</p>}
-          <p className="mt-1 text-[10px] text-slate-400">Antes de gastos</p>
+            : <p className="text-2xl font-bold text-[#111827]">${gananciasSemana.toLocaleString()}</p>}
+          <p className="mt-1 text-[10px] text-[#94A3B8]">Antes de gastos</p>
         </div>
       </div>
       {viajeActivo && (
-        <div className="mb-5 rounded-xl border-l-4 border-blue-500 bg-white p-4 shadow-sm">
+        <div className="mb-5 rounded-xl border-l-4 border-[#1565FF] bg-white p-4 shadow-sm">
           <div className="flex justify-between items-center mb-2">
-            <span className="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded-full">{viajeActivo.status.toUpperCase()}</span>
-            <span className="text-xs text-slate-400">{viajeActivo.folio}</span>
+            <span className="bg-[#1565FF] text-[#0A1F44] text-xs font-bold px-2 py-1 rounded-full">{viajeActivo.status.toUpperCase()}</span>
+            <span className="text-xs text-[#94A3B8]">{viajeActivo.folio}</span>
           </div>
-          <p className="text-sm font-bold text-slate-800 mb-1">{viajeActivo.origen_calle} → {viajeActivo.destino_calle}</p>
-          {viajeActivo.vehiculos && <p className="text-xs text-slate-500">{viajeActivo.vehiculos.marca} {viajeActivo.vehiculos.modelo} · {viajeActivo.vehiculos.placas}</p>}
-          <p className="text-sm font-bold text-green-600 mt-2">${viajeActivo.pago_conductor.toLocaleString()}</p>
+          <p className="text-sm font-bold text-[#111827] mb-1">{viajeActivo.origen_calle} → {viajeActivo.destino_calle}</p>
+          {viajeActivo.vehiculos && <p className="text-xs text-[#6B7280]">{viajeActivo.vehiculos.marca} {viajeActivo.vehiculos.modelo} · {viajeActivo.vehiculos.placas}</p>}
+          <p className="text-sm font-bold text-[#00A846] mt-2">${viajeActivo.pago_conductor.toLocaleString()}</p>
         </div>
       )}
       <h3 className="mb-3 text-sm font-bold text-slate-700">Avisos importantes</h3>
-      <div className="flex gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3">
-        <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-500" />
+      <div className="flex gap-3 rounded-xl border border-[#FFE2CC] bg-[#FFF7ED] p-3">
+        <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#FF6D00]" />
         <div>
-          <p className="text-sm font-semibold text-amber-800">Mantén tus documentos al día</p>
-          <p className="mt-1 text-xs text-amber-700">Verifica tus documentos en Configuración para operar sin interrupciones.</p>
+          <p className="text-sm font-semibold text-[#9A4300]">Mantén tus documentos al día</p>
+          <p className="mt-1 text-xs text-[#C95A00]">Verifica tus documentos en Configuración para operar sin interrupciones.</p>
         </div>
       </div>
     </section>
@@ -794,53 +794,53 @@ function VijesView({ conductor, viajes, onAceptar, onCambiarStatus, cargando }: 
 
   return (
     <section className="fade-in p-5 pb-24">
-      <h2 className="mb-4 text-xl font-bold text-slate-800">Tus viajes</h2>
+      <h2 className="mb-4 text-xl font-bold text-[#111827]">Tus viajes</h2>
       <div className="mb-5 flex gap-2 rounded-lg bg-slate-100 p-1">
         {(["solicitados","aceptados"] as TripTab[]).map(tab => (
           <button key={tab} type="button" onClick={() => setActiveTab(tab)}
             className={cx("flex-1 rounded-md py-2 text-sm font-semibold transition-all",
-              activeTab === tab ? "bg-white text-slate-800 shadow-sm" : "text-slate-500")}>
+              activeTab === tab ? "bg-white text-[#111827] shadow-sm" : "text-[#6B7280]")}>
             {tab === "solicitados" ? `Solicitados (${solicitados.length})` : `Aceptados (${aceptados.length})`}
           </button>
         ))}
       </div>
-      {cargando && <div className="flex items-center justify-center py-12 text-slate-400 gap-2"><Loader className="h-5 w-5 animate-spin" /><span className="text-sm">Cargando viajes...</span></div>}
+      {cargando && <div className="flex items-center justify-center py-12 text-[#94A3B8] gap-2"><Loader className="h-5 w-5 animate-spin" /><span className="text-sm">Cargando viajes...</span></div>}
       {!cargando && activeTab === "solicitados" && (
         <div className="space-y-4">
           {solicitados.length === 0
-            ? <div className="rounded-xl border border-slate-200 bg-white p-8 text-center shadow-sm"><Car className="h-10 w-10 text-slate-200 mx-auto mb-2" /><p className="text-sm text-slate-400">No hay viajes disponibles en este momento.</p><p className="text-xs text-slate-300 mt-1">Activa tu disponibilidad para recibir ofertas.</p></div>
+            ? <div className="rounded-xl border border-[#E5E7EB] bg-white p-8 text-center shadow-sm"><Car className="h-10 w-10 text-slate-200 mx-auto mb-2" /><p className="text-sm text-[#94A3B8]">No hay viajes disponibles en este momento.</p><p className="text-xs text-slate-300 mt-1">Activa tu disponibilidad para recibir ofertas.</p></div>
             : solicitados.map(viaje => (
-              <div key={viaje.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <div key={viaje.id} className="rounded-xl border border-[#E5E7EB] bg-white p-4 shadow-sm">
                 <div className="mb-3 flex items-start justify-between">
-                  <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-bold text-blue-700">NUEVA OFERTA</span>
-                  <span className="text-xs text-slate-400">{viaje.folio}</span>
+                  <span className="rounded-full bg-[#1565FF] px-2 py-1 text-xs font-bold text-[#0A1F44]">NUEVA OFERTA</span>
+                  <span className="text-xs text-[#94A3B8]">{viaje.folio}</span>
                 </div>
                 <div className="mb-4 flex gap-3">
                   <div className="flex flex-col items-center pt-1">
-                    <div className="h-2.5 w-2.5 rounded-full bg-green-500" />
+                    <div className="h-2.5 w-2.5 rounded-full bg-[#00C853]" />
                     <div className="my-1 h-8 w-0.5 bg-slate-200" />
                     <div className="h-2.5 w-2.5 rounded-full bg-red-500" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-slate-500">Origen</p>
-                    <p className="text-sm font-semibold leading-tight text-slate-800 truncate">{[viaje.origen_calle, viaje.origen_colonia].filter(Boolean).join(", ")}</p>
-                    <p className="mt-2 text-xs text-slate-500">Destino</p>
-                    <p className="text-sm font-semibold leading-tight text-slate-800 truncate">{[viaje.destino_calle, viaje.destino_colonia].filter(Boolean).join(", ")}</p>
+                    <p className="text-xs text-[#6B7280]">Origen</p>
+                    <p className="text-sm font-semibold leading-tight text-[#111827] truncate">{[viaje.origen_calle, viaje.origen_colonia].filter(Boolean).join(", ")}</p>
+                    <p className="mt-2 text-xs text-[#6B7280]">Destino</p>
+                    <p className="text-sm font-semibold leading-tight text-[#111827] truncate">{[viaje.destino_calle, viaje.destino_colonia].filter(Boolean).join(", ")}</p>
                   </div>
                 </div>
                 <div className="mb-4 space-y-2 border-t border-slate-100 pt-3">
-                  {viaje.vehiculos && <div className="flex justify-between text-sm"><span className="text-slate-500">Vehículo:</span><span className="font-medium text-slate-800">{viaje.vehiculos.marca} {viaje.vehiculos.modelo} · {viaje.vehiculos.transmision ?? ""}</span></div>}
-                  {viaje.fecha_programada && <div className="flex justify-between text-sm"><span className="text-slate-500">Fecha:</span><span className="font-medium text-slate-800">{viaje.fecha_programada} {viaje.hora_programada ? `· ${viaje.hora_programada.slice(0,5)}` : ""}</span></div>}
+                  {viaje.vehiculos && <div className="flex justify-between text-sm"><span className="text-[#6B7280]">Vehículo:</span><span className="font-medium text-[#111827]">{viaje.vehiculos.marca} {viaje.vehiculos.modelo} · {viaje.vehiculos.transmision ?? ""}</span></div>}
+                  {viaje.fecha_programada && <div className="flex justify-between text-sm"><span className="text-[#6B7280]">Fecha:</span><span className="font-medium text-[#111827]">{viaje.fecha_programada} {viaje.hora_programada ? `· ${viaje.hora_programada.slice(0,5)}` : ""}</span></div>}
                   <div className="flex items-center justify-between pt-2">
                     <span className="text-sm font-bold text-slate-700">Tu ganancia estimada:</span>
-                    <span className="text-xl font-bold text-green-600">${viaje.pago_conductor.toLocaleString()}</span>
+                    <span className="text-xl font-bold text-[#00A846]">${viaje.pago_conductor.toLocaleString()}</span>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <button type="button" onClick={() => handleRechazar(viaje)}
-                    className="rounded-lg border border-slate-300 py-3 font-semibold text-slate-600 hover:bg-slate-50">Rechazar</button>
+                    className="rounded-lg border border-slate-300 py-3 font-semibold text-slate-600 hover:bg-[#F8FAFC]">Rechazar</button>
                   <button type="button" onClick={() => handleAceptar(viaje)} disabled={aceptando === viaje.id}
-                    className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 py-3 font-semibold text-white hover:bg-blue-700 disabled:opacity-60">
+                    className="flex items-center justify-center gap-2 rounded-lg bg-[#1565FF] py-3 font-semibold text-[#0A1F44] hover:brightness-95 disabled:opacity-60">
                     {aceptando === viaje.id ? <Loader className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                     Aceptar
                   </button>
@@ -853,24 +853,24 @@ function VijesView({ conductor, viajes, onAceptar, onCambiarStatus, cargando }: 
       {!cargando && activeTab === "aceptados" && (
         <div className="space-y-4">
           {aceptados.length === 0
-            ? <div className="rounded-xl border border-slate-200 bg-white p-8 text-center shadow-sm"><Check className="h-10 w-10 text-slate-200 mx-auto mb-2" /><p className="text-sm text-slate-400">No tienes viajes aceptados activos.</p></div>
+            ? <div className="rounded-xl border border-[#E5E7EB] bg-white p-8 text-center shadow-sm"><Check className="h-10 w-10 text-slate-200 mx-auto mb-2" /><p className="text-sm text-[#94A3B8]">No tienes viajes aceptados activos.</p></div>
             : aceptados.map(viaje => (
-              <div key={viaje.id} className="rounded-xl border-l-4 border-blue-500 bg-white p-4 shadow-sm">
+              <div key={viaje.id} className="rounded-xl border-l-4 border-[#1565FF] bg-white p-4 shadow-sm">
                 <div className="mb-3 flex items-start justify-between">
-                  <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-bold text-blue-700">{viaje.status.toUpperCase()}</span>
-                  <span className="text-xs text-slate-400">{viaje.folio}</span>
+                  <span className="rounded-full bg-[#1565FF] px-2 py-1 text-xs font-bold text-[#0A1F44]">{viaje.status.toUpperCase()}</span>
+                  <span className="text-xs text-[#94A3B8]">{viaje.folio}</span>
                 </div>
-                <p className="mb-1 text-sm font-bold text-slate-800">{viaje.origen_calle} → {viaje.destino_calle}</p>
-                {viaje.vehiculos && <p className="mb-1 text-xs text-slate-500">{viaje.vehiculos.marca} {viaje.vehiculos.modelo} · {viaje.vehiculos.placas}</p>}
-                {viaje.origen_contacto && <p className="text-xs text-slate-500 mb-1">Contacto: {viaje.origen_contacto} {viaje.origen_telefono && `· ${viaje.origen_telefono}`}</p>}
-                {viaje.instrucciones && <p className="text-xs text-amber-700 bg-amber-50 rounded p-2 mt-2">{viaje.instrucciones}</p>}
-                <p className="text-sm font-bold text-green-600 mt-2">${viaje.pago_conductor.toLocaleString()}</p>
+                <p className="mb-1 text-sm font-bold text-[#111827]">{viaje.origen_calle} → {viaje.destino_calle}</p>
+                {viaje.vehiculos && <p className="mb-1 text-xs text-[#6B7280]">{viaje.vehiculos.marca} {viaje.vehiculos.modelo} · {viaje.vehiculos.placas}</p>}
+                {viaje.origen_contacto && <p className="text-xs text-[#6B7280] mb-1">Contacto: {viaje.origen_contacto} {viaje.origen_telefono && `· ${viaje.origen_telefono}`}</p>}
+                {viaje.instrucciones && <p className="text-xs text-[#C95A00] bg-[#FFF7ED] rounded p-2 mt-2">{viaje.instrucciones}</p>}
+                <p className="text-sm font-bold text-[#00A846] mt-2">${viaje.pago_conductor.toLocaleString()}</p>
                 <div className="mt-3 space-y-2">
-                  {viaje.status === "Conductor en camino" && <button type="button" onClick={() => onCambiarStatus(viaje.id, "Recolección en proceso", "Llegada al origen")} className="w-full rounded-lg bg-slate-900 py-3 font-semibold text-white hover:bg-slate-800">✓ Confirmé llegada al origen</button>}
-                  {viaje.status === "Recolección en proceso" && <button type="button" onClick={() => setEvidenceViaje(viaje)} className="w-full flex items-center justify-center gap-2 rounded-lg bg-slate-900 py-3 font-semibold text-white hover:bg-slate-800"><Camera className="h-4 w-4" /> Cargar Evidencia Inicial</button>}
-                  {viaje.status === "Evidencia inicial pendiente" && <button type="button" onClick={() => onCambiarStatus(viaje.id, "Traslado en curso", "Traslado iniciado")} className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white hover:bg-blue-700">🚗 Iniciar traslado</button>}
-                  {viaje.status === "Traslado en curso" && <button type="button" onClick={() => onCambiarStatus(viaje.id, "Entrega en proceso", "Llegada al destino")} className="w-full rounded-lg bg-slate-900 py-3 font-semibold text-white hover:bg-slate-800">✓ Llegué al destino</button>}
-                  {viaje.status === "Entrega en proceso" && <button type="button" onClick={() => setEvidenceViaje(viaje)} className="w-full flex items-center justify-center gap-2 rounded-lg bg-slate-900 py-3 font-semibold text-white hover:bg-slate-800"><Camera className="h-4 w-4" /> Cargar Evidencia Final</button>}
+                  {viaje.status === "Conductor en camino" && <button type="button" onClick={() => onCambiarStatus(viaje.id, "Recolección en proceso", "Llegada al origen")} className="w-full rounded-lg bg-[#0A1F44] py-3 font-semibold text-white hover:bg-slate-800">✓ Confirmé llegada al origen</button>}
+                  {viaje.status === "Recolección en proceso" && <button type="button" onClick={() => setEvidenceViaje(viaje)} className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#0A1F44] py-3 font-semibold text-white hover:bg-slate-800"><Camera className="h-4 w-4" /> Cargar Evidencia Inicial</button>}
+                  {viaje.status === "Evidencia inicial pendiente" && <button type="button" onClick={() => onCambiarStatus(viaje.id, "Traslado en curso", "Traslado iniciado")} className="w-full rounded-lg bg-[#0A1F44] py-3 font-semibold text-[#FFFFFF] hover:bg-[#2a2a2a]">🚗 Iniciar traslado</button>}
+                  {viaje.status === "Traslado en curso" && <button type="button" onClick={() => onCambiarStatus(viaje.id, "Entrega en proceso", "Llegada al destino")} className="w-full rounded-lg bg-[#0A1F44] py-3 font-semibold text-white hover:bg-slate-800">✓ Llegué al destino</button>}
+                  {viaje.status === "Entrega en proceso" && <button type="button" onClick={() => setEvidenceViaje(viaje)} className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#0A1F44] py-3 font-semibold text-white hover:bg-slate-800"><Camera className="h-4 w-4" /> Cargar Evidencia Final</button>}
                 </div>
               </div>
             ))
@@ -904,25 +904,25 @@ function VijesView({ conductor, viajes, onAceptar, onCambiarStatus, cargando }: 
 
 // ─── GANANCIAS VIEW ───────────────────────────────────────────────────────────
 function GananciasView({ conductor, pagos, cargando }: { conductor: ConductorPerfil | null; pagos: PagoResumen[]; cargando: boolean }) {
-  const pagoEstilo: Record<string, string> = { Pagado: "text-green-600", Pendiente: "text-amber-600", "En revisión": "text-blue-600", Rechazado: "text-red-600" }
+  const pagoEstilo: Record<string, string> = { Pagado: "text-[#00A846]", Pendiente: "text-[#FF6D00]", "En revisión": "text-[#1E88E5]", Rechazado: "text-red-600" }
   return (
     <section className="fade-in p-5 pb-24">
-      <h2 className="mb-4 text-xl font-bold text-slate-800">Mis ganancias</h2>
-      <div className="mb-6 rounded-xl bg-slate-900 p-5 text-white shadow-lg">
-        <p className="mb-1 text-sm text-slate-400">Ganancias totales acumuladas</p>
+      <h2 className="mb-4 text-xl font-bold text-[#111827]">Mis ganancias</h2>
+      <div className="mb-6 rounded-xl bg-[#0A1F44] p-5 text-white shadow-lg">
+        <p className="mb-1 text-sm text-[#94A3B8]">Ganancias totales acumuladas</p>
         {cargando ? <div className="h-9 w-32 animate-pulse bg-slate-700 rounded mb-4" /> : <h3 className="mb-4 text-3xl font-bold">${(conductor?.ganancias_total ?? 0).toLocaleString()}</h3>}
         <div className="grid grid-cols-2 gap-2 border-t border-slate-700 pt-4 text-center">
-          <div><p className="text-xs text-slate-400">Viajes realizados</p><p className="text-sm font-semibold">{conductor?.viajes_realizados ?? 0}</p></div>
-          <div><p className="text-xs text-slate-400">Calificación</p><p className="text-sm font-semibold text-amber-400">★ {conductor?.calificacion?.toFixed(1) ?? "—"}</p></div>
+          <div><p className="text-xs text-[#94A3B8]">Viajes realizados</p><p className="text-sm font-semibold">{conductor?.viajes_realizados ?? 0}</p></div>
+          <div><p className="text-xs text-[#94A3B8]">Calificación</p><p className="text-sm font-semibold text-[#FF6D00]">★ {conductor?.calificacion?.toFixed(1) ?? "—"}</p></div>
         </div>
       </div>
       <h3 className="mb-3 text-sm font-bold text-slate-700">Historial de pagos</h3>
       {cargando ? <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-16 animate-pulse bg-slate-100 rounded-xl" />)}</div>
-        : pagos.length === 0 ? <div className="rounded-xl border border-slate-200 bg-white p-8 text-center"><p className="text-sm text-slate-400">Sin registros de pago aún.</p></div>
+        : pagos.length === 0 ? <div className="rounded-xl border border-[#E5E7EB] bg-white p-8 text-center"><p className="text-sm text-[#94A3B8]">Sin registros de pago aún.</p></div>
         : <div className="space-y-3">{pagos.map(pago => (
-            <div key={pago.id} className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-              <div><p className="text-sm font-semibold text-slate-800">{pago.periodo}</p><p className="text-xs text-slate-500">{pago.viajes_revisados} viajes · {pago.fecha_pago ?? "Pendiente"}</p></div>
-              <div className="text-right"><p className="text-base font-bold text-slate-800">${pago.deposito_esperado.toLocaleString()}</p><p className={`text-xs font-semibold ${pagoEstilo[pago.estatus] ?? "text-slate-500"}`}>{pago.estatus}</p></div>
+            <div key={pago.id} className="flex items-center justify-between rounded-xl border border-[#E5E7EB] bg-white p-4 shadow-sm">
+              <div><p className="text-sm font-semibold text-[#111827]">{pago.periodo}</p><p className="text-xs text-[#6B7280]">{pago.viajes_revisados} viajes · {pago.fecha_pago ?? "Pendiente"}</p></div>
+              <div className="text-right"><p className="text-base font-bold text-[#111827]">${pago.deposito_esperado.toLocaleString()}</p><p className={`text-xs font-semibold ${pagoEstilo[pago.estatus] ?? "text-[#6B7280]"}`}>{pago.estatus}</p></div>
             </div>
           ))}</div>
       }
@@ -935,19 +935,19 @@ function SettingsView({ conductor, onBack }: { conductor: ConductorPerfil | null
   return (
     <section className="fade-in p-5 pb-24">
       <div className="mb-5 flex items-center gap-3">
-        <button type="button" onClick={onBack} className="text-slate-500 hover:text-slate-800">← Volver</button>
-        <h2 className="text-xl font-bold text-slate-800">Mi perfil</h2>
+        <button type="button" onClick={onBack} className="text-[#6B7280] hover:text-[#111827]">← Volver</button>
+        <h2 className="text-xl font-bold text-[#111827]">Mi perfil</h2>
       </div>
       {conductor && (
-        <div className="mb-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm text-center">
-          <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-blue-600 text-white text-2xl font-bold">
+        <div className="mb-5 rounded-xl border border-[#E5E7EB] bg-white p-5 shadow-sm text-center">
+          <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-[#1565FF] text-[#0A1F44] text-2xl font-bold">
             {conductor.nombre[0]}{conductor.apellido[0]}
           </div>
-          <h3 className="text-lg font-bold text-slate-800">{conductor.nombre} {conductor.apellido}</h3>
-          <p className="text-sm text-slate-500">{conductor.telefono}</p>
+          <h3 className="text-lg font-bold text-[#111827]">{conductor.nombre} {conductor.apellido}</h3>
+          <p className="text-sm text-[#6B7280]">{conductor.telefono}</p>
           <div className="flex justify-center gap-4 mt-3">
-            <div className="text-center"><p className="text-lg font-bold text-slate-800">{conductor.viajes_realizados}</p><p className="text-xs text-slate-400">Viajes</p></div>
-            <div className="text-center"><p className="text-lg font-bold text-amber-500">★ {conductor.calificacion.toFixed(1)}</p><p className="text-xs text-slate-400">Calificación</p></div>
+            <div className="text-center"><p className="text-lg font-bold text-[#111827]">{conductor.viajes_realizados}</p><p className="text-xs text-[#94A3B8]">Viajes</p></div>
+            <div className="text-center"><p className="text-lg font-bold text-[#FF6D00]">★ {conductor.calificacion.toFixed(1)}</p><p className="text-xs text-[#94A3B8]">Calificación</p></div>
           </div>
         </div>
       )}
@@ -957,9 +957,9 @@ function SettingsView({ conductor, onBack }: { conductor: ConductorPerfil | null
           { icon: Landmark, label: "Cuenta bancaria", sub: "CLABE y banco" },
           { icon: MapPin, label: "Mi ubicación", sub: "Municipio y estado" },
         ].map(item => (
-          <div key={item.label} className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div key={item.label} className="flex items-center gap-3 rounded-xl border border-[#E5E7EB] bg-white p-4 shadow-sm">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-600"><item.icon className="h-4 w-4" /></div>
-            <div className="flex-1"><p className="text-sm font-semibold text-slate-800">{item.label}</p><p className="text-xs text-slate-400">{item.sub}</p></div>
+            <div className="flex-1"><p className="text-sm font-semibold text-[#111827]">{item.label}</p><p className="text-xs text-[#94A3B8]">{item.sub}</p></div>
             <ChevronRight className="h-4 w-4 text-slate-300" />
           </div>
         ))}
@@ -988,49 +988,49 @@ function EvidenceModal({ viaje, onClose, onSubmit }: {
 
   return (
     <div className="absolute inset-0 z-50 flex flex-col bg-white">
-      <div className="flex items-center gap-3 border-b border-slate-200 p-4">
-        <button type="button" onClick={onClose}><X className="h-5 w-5 text-slate-500" /></button>
-        <h3 className="font-bold text-slate-800">Evidencia {tipo === "inicial" ? "Inicial" : "Final"} · {viaje.folio}</h3>
+      <div className="flex items-center gap-3 border-b border-[#E5E7EB] p-4">
+        <button type="button" onClick={onClose}><X className="h-5 w-5 text-[#6B7280]" /></button>
+        <h3 className="font-bold text-[#111827]">Evidencia {tipo === "inicial" ? "Inicial" : "Final"} · {viaje.folio}</h3>
       </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         <div>
-          <p className="text-xs font-bold text-slate-500 uppercase mb-2">📷 Fotografías (5 ángulos)</p>
+          <p className="text-xs font-bold text-[#6B7280] uppercase mb-2">📷 Fotografías (5 ángulos)</p>
           <div className="grid grid-cols-5 gap-2">
             {slots.map(slot => (
-              <div key={slot} className="aspect-square rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100">
+              <div key={slot} className="aspect-square rounded-lg border-2 border-dashed border-slate-300 bg-[#F8FAFC] flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100">
                 <Camera className="h-5 w-5 text-slate-300 mb-1" />
-                <p className="text-[9px] text-slate-400 text-center leading-tight">{slot}</p>
+                <p className="text-[9px] text-[#94A3B8] text-center leading-tight">{slot}</p>
               </div>
             ))}
           </div>
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-500 mb-1">Kilometraje {tipo === "inicial" ? "inicial" : "final"}</label>
+          <label className="block text-xs font-medium text-[#6B7280] mb-1">Kilometraje {tipo === "inicial" ? "inicial" : "final"}</label>
           <input type="number" value={km} onChange={e => setKm(e.target.value)} placeholder="45820"
-            className="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            className="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1565FF]" />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-500 mb-1">Nivel de combustible</label>
+          <label className="block text-xs font-medium text-[#6B7280] mb-1">Nivel de combustible</label>
           <div className="grid grid-cols-5 gap-2">
             {["Vacío","1/4","1/2","3/4","Lleno"].map(n => (
               <button key={n} type="button" onClick={() => setCombustible(n)}
                 className={cx("py-2 rounded-lg text-xs font-semibold border transition-colors",
-                  combustible === n ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-300")}>
+                  combustible === n ? "bg-[#1565FF] text-[#0A1F44] border-[#1565FF]" : "bg-white text-slate-600 border-slate-300")}>
                 {n}
               </button>
             ))}
           </div>
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-500 mb-1">Daños visibles</label>
+          <label className="block text-xs font-medium text-[#6B7280] mb-1">Daños visibles</label>
           <textarea value={danos} onChange={e => setDanos(e.target.value)}
             placeholder="Sin daños. / Describir cualquier daño preexistente..." rows={3}
-            className="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            className="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1565FF]" />
         </div>
       </div>
-      <div className="border-t border-slate-200 p-4">
+      <div className="border-t border-[#E5E7EB] p-4">
         <button type="button" onClick={handleSubmit} disabled={enviando}
-          className="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-4 font-bold text-white hover:bg-blue-700 disabled:opacity-60">
+          className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#1565FF] py-4 font-bold text-[#0A1F44] hover:brightness-95 disabled:opacity-60">
           {enviando ? <Loader className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
           {enviando ? "Guardando..." : `Confirmar evidencia ${tipo}`}
         </button>
@@ -1042,13 +1042,13 @@ function EvidenceModal({ viaje, onClose, onSubmit }: {
 // ─── BOTTOM NAV ───────────────────────────────────────────────────────────────
 function BottomNavigation({ activeView, onChange }: { activeView: View; onChange: (v: View) => void }) {
   return (
-    <nav className="flex flex-shrink-0 border-t border-slate-200 bg-white">
+    <nav className="flex flex-shrink-0 border-t border-[#E5E7EB] bg-white">
       {navItems.map(({ id, label, icon: Icon }) => {
         const active = activeView === id;
         return (
           <button key={id} type="button" onClick={() => onChange(id)}
             className={cx("flex flex-1 flex-col items-center gap-1 py-2 text-xs font-medium transition-colors",
-              active ? "text-blue-600" : "text-slate-500 hover:text-slate-700")}>
+              active ? "text-[#1565FF]" : "text-[#6B7280] hover:text-slate-700")}>
             <Icon className={cx("h-5 w-5", active && "fill-blue-100")} />
             {label}
           </button>
@@ -1253,7 +1253,7 @@ export default function DriverApp() {
     <div className="flex min-h-screen items-center justify-center p-0 md:p-4">
       <div className="mobile-mockup flex flex-col relative">
         <Header onOpenSettings={() => showView("configuracion")} conductor={conductor} />
-        <main ref={mainRef} className="no-scrollbar relative flex-1 overflow-y-auto bg-slate-50">
+        <main ref={mainRef} className="no-scrollbar relative flex-1 overflow-y-auto bg-[linear-gradient(180deg,#F8FAFC_0%,#EDF4FF_100%)]">
           {activeView === "panel" && <PanelView conductor={conductor} viajes={viajes} onDisponibilidadChange={handleDisponibilidadChange} cargando={cargando} />}
           {activeView === "viajes" && <VijesView conductor={conductor} viajes={viajes} onAceptar={handleAceptar} onCambiarStatus={handleCambiarStatus} cargando={cargando} />}
           {activeView === "ganancias" && <GananciasView conductor={conductor} pagos={pagos} cargando={cargando} />}
