@@ -196,7 +196,7 @@ function StepRegister({ onBack, onNext }: {
   const [form, setForm] = useState({
     nombre: "", apellido: "", curp: "", telefono: "", email: "",
     password: "", confirmar: "",
-    municipio: "", estado: "",
+    calle: "", numero: "", colonia: "", cp: "", municipio: "", estado: "",
     banco: "", clabe: "", titular: "",
   })
   const [show, setShow] = useState(false)
@@ -219,6 +219,8 @@ function StepRegister({ onBack, onNext }: {
     if (form.password !== form.confirmar) e.confirmar = "Las contraseñas no coinciden"
     if (!form.municipio.trim()) e.municipio = "Requerido"
     if (!form.estado.trim())    e.estado    = "Requerido"
+    if (!form.calle.trim())     e.calle     = "Requerido"
+    if (!form.cp.trim())        e.cp        = "Requerido"
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -276,7 +278,39 @@ function StepRegister({ onBack, onNext }: {
                 onChange={e => set("email", e.target.value)} className={inputCls(errors.email)} />
               <OErr msg={errors.email} />
             </div>
+          </div>
+        </div>
 
+        {/* ── Domicilio ── */}
+        <div>
+          <p className={sec}>🏠 Domicilio</p>
+          <div className="space-y-3">
+            <div className="grid grid-cols-3 gap-3">
+              <div className="col-span-2">
+                <OLabel req>Calle</OLabel>
+                <input type="text" value={form.calle} placeholder="NOMBRE DE LA CALLE"
+                  onChange={e => set("calle", e.target.value.toUpperCase())} className={inputCls(errors.calle)} />
+                <OErr msg={errors.calle} />
+              </div>
+              <div>
+                <OLabel>Número</OLabel>
+                <input type="text" value={form.numero} placeholder="EXT/INT"
+                  onChange={e => set("numero", e.target.value.toUpperCase())} className={inputCls()} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <OLabel>Colonia</OLabel>
+                <input type="text" value={form.colonia} placeholder="COLONIA"
+                  onChange={e => set("colonia", e.target.value.toUpperCase())} className={inputCls()} />
+              </div>
+              <div>
+                <OLabel req>Código Postal</OLabel>
+                <input type="text" value={form.cp} placeholder="00000" maxLength={5}
+                  onChange={e => set("cp", e.target.value.replace(/\D/g,"").slice(0,5))} className={inputCls(errors.cp)} />
+                <OErr msg={errors.cp} />
+              </div>
+            </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <OLabel req>Municipio / Alcaldía</OLabel>
@@ -1041,7 +1075,8 @@ export default function DriverApp() {
   const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>("welcome")
   const [registerData, setRegisterData] = useState<{
     nombre: string; apellido: string; telefono: string; email: string; password: string
-    curp: string; municipio: string; estado: string; banco: string; clabe: string; titular: string
+    curp: string; calle: string; numero: string; colonia: string; cp: string
+    municipio: string; estado: string; banco: string; clabe: string; titular: string
   } | null>(null)
   const [legalLoading, setLegalLoading] = useState(false)
   const [conductorAuthId, setConductorAuthId] = useState<string | null>(null)
@@ -1138,20 +1173,24 @@ export default function DriverApp() {
       if (!authId) throw new Error("No se pudo crear el usuario")
 
       await sb.from("conductores").insert({
-        auth_id:        authId,
-        nombre:         registerData.nombre,
-        apellido:       registerData.apellido,
-        telefono:       registerData.telefono,
-        email:          registerData.email,
-        curp:           registerData.curp?.toUpperCase() || null,
-        municipio:      registerData.municipio?.toUpperCase() || null,
-        estado_geo:     registerData.estado?.toUpperCase() || null,
-        cuenta_banco:   registerData.banco?.toUpperCase() || null,
-        cuenta_clabe:   registerData.clabe || null,
-        cuenta_titular: registerData.titular?.toUpperCase() || null,
-        disponibilidad: "No disponible",
-        certificacion:  "Pendiente de validación",
-        calificacion:   0,
+        auth_id:           authId,
+        nombre:            registerData.nombre,
+        apellido:          registerData.apellido,
+        telefono:          registerData.telefono,
+        email:             registerData.email,
+        curp:              registerData.curp?.toUpperCase() || null,
+        domicilio_calle:   registerData.calle?.toUpperCase() || null,
+        domicilio_numero:  registerData.numero?.toUpperCase() || null,
+        domicilio_colonia: registerData.colonia?.toUpperCase() || null,
+        domicilio_cp:      registerData.cp || null,
+        municipio:         registerData.municipio?.toUpperCase() || null,
+        estado_geo:        registerData.estado?.toUpperCase() || null,
+        cuenta_banco:      registerData.banco?.toUpperCase() || null,
+        cuenta_clabe:      registerData.clabe || null,
+        cuenta_titular:    registerData.titular?.toUpperCase() || null,
+        disponibilidad:    "No disponible",
+        certificacion:     "Pendiente de validación",
+        calificacion:      0,
       })
 
       setConductorAuthId(authId)
