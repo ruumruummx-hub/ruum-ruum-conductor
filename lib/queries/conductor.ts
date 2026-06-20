@@ -1,6 +1,7 @@
 // lib/queries/conductor.ts — conductor-ruum
 
 import { supabase } from '@/lib/supabase'
+import type { EstatusViaje } from '@/lib/supabase'
 
 // ── AUTH ────────────────────────────────────────────────────
 
@@ -85,23 +86,14 @@ export async function getMisViajesConductor(conductorId: string) {
   return data
 }
 
-export async function aceptarViaje(viajeId: string, conductorNombre: string) {
-  const { data, error } = await supabase
-    .from('viajes')
-    .update({ status: 'Conductor en camino' })
-    .eq('id', viajeId)
-    .select()
-    .single()
-
-  if (error) throw error
-
-  await supabase.from('timeline_viaje').insert({
-    viaje_id: viajeId,
-    evento: 'Conductor aceptó el viaje',
-    actor: conductorNombre,
-    actor_tipo: 'conductor',
+export async function aceptarViaje(viajeId: string, conductorId: string, conductorNombre: string) {
+  const { data, error } = await supabase.rpc('aceptar_viaje_conductor', {
+    p_viaje_id: viajeId,
+    p_conductor_id: conductorId,
+    p_actor_nombre: conductorNombre,
   })
 
+  if (error) throw error
   return data
 }
 
@@ -134,7 +126,7 @@ export async function rechazarViaje(viajeId: string, conductorNombre: string) {
 
 export async function cambiarStatusViaje(
   viajeId: string,
-  status: string,
+  status: EstatusViaje,
   conductorNombre: string,
   evento: string
 ) {
@@ -157,51 +149,50 @@ export async function cambiarStatusViaje(
   return data
 }
 
+export async function cerrarViajeConductor(
+  viajeId: string,
+  conductorId: string,
+  conductorNombre: string
+) {
+  const { data, error } = await supabase.rpc('cerrar_viaje_conductor', {
+    p_viaje_id: viajeId,
+    p_conductor_id: conductorId,
+    p_actor_nombre: conductorNombre,
+  })
+
+  if (error) throw error
+  return data
+}
+
 // ── EVIDENCIA ───────────────────────────────────────────────
 
 export async function subirEvidencia(payload: {
   viaje_id: string
   conductor_id: string
+  conductor_nombre: string
   km_inicial?: number
   km_final?: number
   combustible_inicial?: string
   combustible_final?: string
   llaves_recibidas?: number
   danos_iniciales?: string
+  danos_finales?: string
   tipo: 'inicial' | 'final'
 }) {
-  const { tipo, ...rest } = payload
+  const inicial = payload.tipo === 'inicial'
+  const { data, error } = await supabase.rpc('guardar_evidencia_conductor', {
+    p_viaje_id: payload.viaje_id,
+    p_conductor_id: payload.conductor_id,
+    p_tipo: payload.tipo,
+    p_actor_nombre: payload.conductor_nombre,
+    p_km: inicial ? payload.km_inicial ?? null : payload.km_final ?? null,
+    p_combustible: inicial ? payload.combustible_inicial ?? null : payload.combustible_final ?? null,
+    p_danos: inicial ? payload.danos_iniciales ?? null : payload.danos_finales ?? null,
+    p_llaves: payload.llaves_recibidas ?? null,
+  })
 
-  // Verificar si ya existe evidencia para este viaje
-  const { data: existente } = await supabase
-    .from('evidencias')
-    .select('id')
-    .eq('viaje_id', payload.viaje_id)
-    .single()
-
-  if (existente) {
-    // Actualizar existente
-    const { data, error } = await supabase
-      .from('evidencias')
-      .update({
-        ...rest,
-        estatus: tipo === 'final' ? 'Completa' : 'En revisión',
-      })
-      .eq('id', existente.id)
-      .select()
-      .single()
-    if (error) throw error
-    return data
-  } else {
-    // Crear nueva
-    const { data, error } = await supabase
-      .from('evidencias')
-      .insert({ ...rest, estatus: 'En revisión' })
-      .select()
-      .single()
-    if (error) throw error
-    return data
-  }
+  if (error) throw error
+  return data
 }
 
 // ── GANANCIAS ────────────────────────────────────────────────

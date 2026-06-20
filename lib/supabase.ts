@@ -9,7 +9,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 })
 
 export type EstatusViaje =
-  | 'Solicitud recibida' | 'Pendiente de revisión' | 'Pendiente de asignación'
+  | 'Solicitud recibida' | 'Pendiente de asignación'
   | 'Conductor asignado' | 'Conductor en camino' | 'Recolección en proceso'
   | 'Evidencia inicial pendiente' | 'Traslado en curso' | 'Entrega en proceso'
   | 'Evidencia final pendiente' | 'Finalizado' | 'Cancelado' | 'En revisión por incidencia'

@@ -2,10 +2,11 @@
 
 import { useRef, useState, useEffect, useCallback } from "react";
 import { supabase as sb } from "@/lib/supabase";
+import type { EstatusViaje } from "@/lib/supabase";
 import {
   getMiPerfilConductor, updateDisponibilidad, getMisViajesConductor,
   aceptarViaje, rechazarViaje, cambiarStatusViaje, getMisGanancias,
-  suscribirViajesAsignados,
+  cerrarViajeConductor, subirEvidencia, suscribirViajesAsignados,
 } from "@/lib/queries/conductor";
 import {
   AlertCircle, Camera, Car, Check, ChevronRight,
@@ -792,11 +793,13 @@ function PanelView({ conductor, viajes, onDisponibilidadChange, cargando }: {
 }
 
 // ─── VIAJES VIEW ──────────────────────────────────────────────────────────────
-function VijesView({ conductor, viajes, onAceptar, onRechazar, onCambiarStatus, cargando }: {
+function VijesView({ conductor, viajes, onAceptar, onRechazar, onCambiarStatus, onCerrar, onRecargar, cargando }: {
   conductor: ConductorPerfil | null; viajes: ViajeDB[]
   onAceptar: (id: string) => Promise<void>
   onRechazar: (id: string) => Promise<void>
-  onCambiarStatus: (id: string, status: string, evento: string) => Promise<void>
+  onCambiarStatus: (id: string, status: EstatusViaje, evento: string) => Promise<void>
+  onCerrar: (id: string) => Promise<void>
+  onRecargar: () => Promise<void>
   cargando: boolean
 }) {
   const [activeTab, setActiveTab] = useState<TripTab>("solicitados")
@@ -897,6 +900,7 @@ function VijesView({ conductor, viajes, onAceptar, onRechazar, onCambiarStatus, 
                   {viaje.status === "Evidencia inicial pendiente" && <RRButton variant="dark" fullWidth onClick={() => onCambiarStatus(viaje.id, "Traslado en curso", "Traslado iniciado")}>🚗 Iniciar traslado</RRButton>}
                   {viaje.status === "Traslado en curso" && <RRButton variant="dark" fullWidth onClick={() => onCambiarStatus(viaje.id, "Entrega en proceso", "Llegada al destino")}>✓ Llegué al destino</RRButton>}
                   {viaje.status === "Entrega en proceso" && <RRButton variant="dark" fullWidth onClick={() => setEvidenceViaje(viaje)}><Camera className="h-4 w-4" /> Cargar Evidencia Final</RRButton>}
+                  {viaje.status === "Evidencia final pendiente" && <RRButton variant="primary" fullWidth onClick={() => onCerrar(viaje.id)}><Check className="h-4 w-4" /> Cerrar viaje</RRButton>}
                 </div>
               </RRCard>
             ))
@@ -906,28 +910,29 @@ function VijesView({ conductor, viajes, onAceptar, onRechazar, onCambiarStatus, 
       {evidenceViaje && (
         <EvidenceModal viaje={evidenceViaje} onClose={() => setEvidenceViaje(null)}
           onSubmit={async (datos) => {
+            if (!conductor) return
             const tipo = evidenceViaje.status === "Recolección en proceso" ? "inicial" : "final"
-            const { error } = await sb.from("evidencias").upsert({
+            try {
+              await subirEvidencia({
               viaje_id: evidenceViaje.id,
+              conductor_id: conductor.id,
+              conductor_nombre: `${conductor.nombre} ${conductor.apellido}`,
               km_inicial: tipo === "inicial" ? datos.km : undefined,
               km_final: tipo === "final" ? datos.km : undefined,
               combustible_inicial: tipo === "inicial" ? datos.combustible : undefined,
               combustible_final: tipo === "final" ? datos.combustible : undefined,
               danos_iniciales: tipo === "inicial" ? datos.danos : undefined,
               danos_finales: tipo === "final" ? datos.danos : undefined,
-              estatus: "En revisión",
-            }, { onConflict: "viaje_id" })
-
-            if (error) {
+              tipo,
+              })
+            } catch (error) {
               console.error("Error guardando evidencia:", error)
               alert("No se pudo guardar la evidencia. Intenta de nuevo.")
               return // no avanza el estatus del viaje si la evidencia no se guardó
             }
 
-            const nuevoStatus = tipo === "inicial" ? "Evidencia inicial pendiente" : "Evidencia final pendiente"
-            const evento = tipo === "inicial" ? "Evidencia inicial cargada" : "Evidencia final cargada"
-            await onCambiarStatus(evidenceViaje.id, nuevoStatus, evento)
             setEvidenceViaje(null)
+            await onRecargar()
           }}
         />
       )}
@@ -1202,8 +1207,10 @@ export default function DriverApp() {
   }
 
   const handleAceptar = async (viajeId: string) => {
+    if (!conductor) return
     const nombre = conductor ? `${conductor.nombre} ${conductor.apellido}` : "Conductor"
-    await aceptarViaje(viajeId, nombre)
+    await aceptarViaje(viajeId, conductor.id, nombre)
+    await cargarConductor()
     await cargarViajes()
   }
 
@@ -1218,10 +1225,22 @@ export default function DriverApp() {
     }
   }
 
-  const handleCambiarStatus = async (viajeId: string, status: string, evento: string) => {
+  const handleCambiarStatus = async (viajeId: string, status: EstatusViaje, evento: string) => {
     const nombre = conductor ? `${conductor.nombre} ${conductor.apellido}` : "Conductor"
     await cambiarStatusViaje(viajeId, status, nombre, evento)
     await cargarViajes()
+  }
+
+  const handleCerrarViaje = async (viajeId: string) => {
+    if (!conductor) return
+    const nombre = `${conductor.nombre} ${conductor.apellido}`
+    try {
+      await cerrarViajeConductor(viajeId, conductor.id, nombre)
+      await Promise.all([cargarConductor(), cargarViajes(), cargarPagos()])
+    } catch (e) {
+      console.error("Error cerrando viaje:", e)
+      alert("No se pudo cerrar el viaje. Verifica que la evidencia final esté registrada.")
+    }
   }
 
   // ── ONBOARDING: Crear cuenta al aceptar términos ──
@@ -1347,7 +1366,7 @@ export default function DriverApp() {
         <Header onOpenSettings={() => showView("configuracion")} conductor={conductor} />
         <main ref={mainRef} className="no-scrollbar relative flex-1 overflow-y-auto bg-[linear-gradient(180deg,#F8FAFC_0%,#EDF4FF_100%)]">
           {activeView === "panel" && <PanelView conductor={conductor} viajes={viajes} onDisponibilidadChange={handleDisponibilidadChange} cargando={cargando} />}
-          {activeView === "viajes" && <VijesView conductor={conductor} viajes={viajes} onAceptar={handleAceptar} onRechazar={handleRechazarViaje} onCambiarStatus={handleCambiarStatus} cargando={cargando} />}
+          {activeView === "viajes" && <VijesView conductor={conductor} viajes={viajes} onAceptar={handleAceptar} onRechazar={handleRechazarViaje} onCambiarStatus={handleCambiarStatus} onCerrar={handleCerrarViaje} onRecargar={cargarViajes} cargando={cargando} />}
           {activeView === "ganancias" && <GananciasView conductor={conductor} pagos={pagos} cargando={cargando} />}
           {activeView === "configuracion" && <SettingsView conductor={conductor} onBack={() => showView("panel")} />}
         </main>
