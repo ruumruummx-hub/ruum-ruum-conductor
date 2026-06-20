@@ -6,5 +6,5 @@ export * from "./RRStatCard";
 export * from "./RRHeader";
 export * from "./RRBottomNav";
 export * from "./RRTripCard";
-export * from "./RRevidenceGallery";
+export * from "./RREvidenceGallery";
 export * from "./RRTimeline";
