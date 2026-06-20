@@ -135,14 +135,43 @@ function OErr({ msg }: { msg?: string }) {
   return msg ? <p className="text-xs text-red-500 mt-0.5">{msg}</p> : null
 }
 
+const MAX_DOCUMENT_BYTES = 3 * 1024 * 1024
+
+async function prepararDocumento(file: File): Promise<File> {
+  if (file.size <= MAX_DOCUMENT_BYTES) return file
+  if (!file.type.startsWith("image/")) throw new Error("El PDF debe pesar máximo 3 MB")
+
+  const bitmap = await createImageBitmap(file)
+  const escala = Math.min(1, 1800 / Math.max(bitmap.width, bitmap.height))
+  const canvas = document.createElement("canvas")
+  canvas.width = Math.round(bitmap.width * escala)
+  canvas.height = Math.round(bitmap.height * escala)
+  canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+  bitmap.close()
+
+  const convertir = (calidad: number) => new Promise<Blob | null>(resolve => canvas.toBlob(resolve, "image/jpeg", calidad))
+  let blob = await convertir(0.82)
+  if (blob && blob.size > MAX_DOCUMENT_BYTES) blob = await convertir(0.65)
+  if (!blob || blob.size > MAX_DOCUMENT_BYTES) throw new Error("No fue posible reducir la imagen a menos de 3 MB")
+  return new File([blob], `${file.name.replace(/\.[^.]+$/, "")}.jpg`, { type: "image/jpeg" })
+}
+
 function UploadBox({ label, accept = "image/*,.pdf", value, onChange, error }: {
   label: string; accept?: string; value: DocFile
   onChange: (f: DocFile) => void; error?: string
 }) {
   const ref = useRef<HTMLInputElement>(null)
-  const handle = (file: File) => {
-    const preview = file.type.startsWith("image/") ? URL.createObjectURL(file) : ""
-    onChange({ file, preview })
+  const [fileError, setFileError] = useState("")
+  const handle = async (file: File) => {
+    try {
+      setFileError("")
+      const preparado = await prepararDocumento(file)
+      const preview = preparado.type.startsWith("image/") ? URL.createObjectURL(preparado) : ""
+      onChange({ file: preparado, preview })
+    } catch (e) {
+      onChange(null)
+      setFileError(e instanceof Error ? e.message : "Archivo no válido")
+    }
   }
   return (
     <div>
@@ -177,6 +206,7 @@ function UploadBox({ label, accept = "image/*,.pdf", value, onChange, error }: {
         <input ref={ref} type="file" accept={accept} className="hidden"
           onChange={e => e.target.files?.[0] && handle(e.target.files[0])} />
       </div>
+      <OErr msg={fileError} />
       <OErr msg={error} />
     </div>
   )
@@ -1402,22 +1432,11 @@ export default function DriverApp() {
         cuenta_titular:    registerData.titular?.toUpperCase() || null,
       }
 
-      const formData = new FormData()
-      formData.append("password", registerData.password)
-      formData.append("perfilConductor", JSON.stringify(perfilConductor))
-      if (docsConductorData) {
-        formData.append("licTipo", docsConductorData.licTipo)
-        formData.append("licNumero", docsConductorData.licNumero)
-        formData.append("licVigencia", docsConductorData.licVigencia)
-        if (docsConductorData.licFrente) formData.append("licFrente", docsConductorData.licFrente.file)
-        if (docsConductorData.licReverso) formData.append("licReverso", docsConductorData.licReverso.file)
-        formData.append("ineNumero", docsConductorData.ineNumero)
-        formData.append("ineVigencia", docsConductorData.ineVigencia)
-        if (docsConductorData.ineFrente) formData.append("ineFrente", docsConductorData.ineFrente.file)
-        if (docsConductorData.domicilio) formData.append("domicilio", docsConductorData.domicilio.file)
-      }
-
-      const registro = await fetch("/api/registro-conductor", { method: "POST", body: formData })
+      const registro = await fetch("/api/registro-conductor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: registerData.password, perfilConductor }),
+      })
       if (!registro.ok) {
         const data = await registro.json().catch(() => null) as { error?: string } | null
         throw new Error(data?.error ?? "No se pudo crear la cuenta.")
@@ -1429,6 +1448,38 @@ export default function DriverApp() {
       })
       if (loginError) throw loginError
 
+      const { data: { session } } = await sb.auth.getSession()
+      if (!session) throw new Error("La cuenta se creó, pero no fue posible iniciar sesión.")
+
+      if (docsConductorData) {
+        const folioLicencia = `${docsConductorData.licTipo} ${docsConductorData.licNumero}`.trim()
+        const documentos = [
+          { archivo: docsConductorData.licFrente, nombre: "licencia-frente", tipo: "Licencia", folio: folioLicencia, vigencia: docsConductorData.licVigencia },
+          { archivo: docsConductorData.licReverso, nombre: "licencia-reverso", tipo: "Licencia", folio: folioLicencia, vigencia: docsConductorData.licVigencia },
+          { archivo: docsConductorData.ineFrente, nombre: "ine-frente", tipo: "INE / Pasaporte", folio: docsConductorData.ineNumero, vigencia: docsConductorData.ineVigencia },
+          { archivo: docsConductorData.domicilio, nombre: "comprobante-domicilio", tipo: "Comprobante domicilio", folio: "", vigencia: "" },
+        ]
+        const resultados = await Promise.all(documentos.map(async documento => {
+          if (!documento.archivo) return null
+          const form = new FormData()
+          form.append("file", documento.archivo.file)
+          form.append("nombreArchivo", documento.nombre)
+          form.append("tipoDoc", documento.tipo)
+          form.append("folio", documento.folio)
+          form.append("vigencia", documento.vigencia)
+          const respuesta = await fetch("/api/documento-conductor", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${session.access_token}` },
+            body: form,
+          })
+          if (respuesta.ok) return null
+          const detalle = await respuesta.json().catch(() => null) as { error?: string } | null
+          return `${documento.nombre}: ${detalle?.error ?? "no se pudo subir"}`
+        }))
+        const fallidos = resultados.filter((r): r is string => Boolean(r))
+        if (fallidos.length) alert(`Tu cuenta fue creada, pero algunos documentos requieren reintento:\n${fallidos.join("\n")}`)
+      }
+
       // El listener onAuthStateChange ya se encarga de fijar conductorAuthId
       // y onboardingDone, pero los fijamos aquí también para una transición
       // inmediata sin esperar el round-trip async del listener.
@@ -1436,7 +1487,7 @@ export default function DriverApp() {
       setOnboardingDone(true)
     } catch (e) {
       console.error("Error en registro:", e)
-      alert("Ocurrió un error al crear tu cuenta. Intenta de nuevo.")
+      alert(e instanceof Error ? e.message : "Ocurrió un error al crear tu cuenta. Intenta de nuevo.")
     } finally {
       setLegalLoading(false)
     }
