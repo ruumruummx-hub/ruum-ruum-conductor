@@ -76,7 +76,12 @@ export async function getMisViajesConductor(conductorId: string) {
       destino_calle, destino_colonia, destino_estado, destino_contacto, destino_telefono,
       instrucciones, pago_conductor, gastos_autorizados,
       vehiculos(marca, modelo, placas, transmision),
-      usuarios(nombre, apellido)
+      usuarios(nombre, apellido),
+      evidencias(
+        id, km_inicial, km_final, combustible_inicial, combustible_final,
+        foto_frente_i, foto_piloto_i, foto_copiloto_i, foto_trasera_i, foto_tablero_i,
+        foto_frente_f, foto_piloto_f, foto_copiloto_f, foto_trasera_f, foto_tablero_f
+      )
     `)
     .eq('conductor_id', conductorId)
     .not('status', 'in', '("Finalizado","Cancelado")')

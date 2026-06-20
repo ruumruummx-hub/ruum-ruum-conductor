@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import { supabase as sb } from "@/lib/supabase";
 import type { EstatusViaje } from "@/lib/supabase";
 import {
@@ -64,6 +64,36 @@ interface ViajeDB {
   gastos_autorizados: number
   vehiculos: { marca: string; modelo: string; placas: string; transmision: string | null } | null
   usuarios: { nombre: string; apellido: string } | null
+  evidencias: {
+    id: string
+    km_inicial: number | null
+    km_final: number | null
+    combustible_inicial: string | null
+    combustible_final: string | null
+    foto_frente_i: string | null
+    foto_piloto_i: string | null
+    foto_copiloto_i: string | null
+    foto_trasera_i: string | null
+    foto_tablero_i: string | null
+    foto_frente_f: string | null
+    foto_piloto_f: string | null
+    foto_copiloto_f: string | null
+    foto_trasera_f: string | null
+    foto_tablero_f: string | null
+  }[] | null
+}
+
+const CAMPOS_FOTO_EVIDENCIA = [
+  ['foto_frente_i', 'Frente inicial'], ['foto_piloto_i', 'Piloto inicial'],
+  ['foto_copiloto_i', 'Copiloto inicial'], ['foto_trasera_i', 'Trasera inicial'],
+  ['foto_tablero_i', 'Tablero inicial'], ['foto_frente_f', 'Frente final'],
+  ['foto_piloto_f', 'Piloto final'], ['foto_copiloto_f', 'Copiloto final'],
+  ['foto_trasera_f', 'Trasera final'], ['foto_tablero_f', 'Tablero final'],
+] as const
+
+function contarFotos(viaje: ViajeDB) {
+  return (viaje.evidencias ?? []).reduce((total, evidencia) =>
+    total + CAMPOS_FOTO_EVIDENCIA.filter(([campo]) => Boolean(evidencia[campo])).length, 0)
 }
 
 interface PagoResumen {
@@ -805,6 +835,7 @@ function VijesView({ conductor, viajes, onAceptar, onRechazar, onCambiarStatus, 
   const [activeTab, setActiveTab] = useState<TripTab>("solicitados")
   const [aceptando, setAceptando] = useState<string | null>(null)
   const [evidenceViaje, setEvidenceViaje] = useState<ViajeDB | null>(null)
+  const [evidenceViewViaje, setEvidenceViewViaje] = useState<ViajeDB | null>(null)
 
   const solicitados = viajes.filter(v => v.status === "Conductor asignado")
   const aceptados = viajes.filter(v =>
@@ -895,6 +926,7 @@ function VijesView({ conductor, viajes, onAceptar, onRechazar, onCambiarStatus, 
                 {viaje.instrucciones && <p className="text-xs text-rr-black bg-rr-warningLight rounded-rrSm p-2 mt-2">{viaje.instrucciones}</p>}
                 <p className="text-sm font-bold text-rr-success mt-2">{formatMoney(viaje.pago_conductor)}</p>
                 <div className="mt-3 space-y-2">
+                  {contarFotos(viaje) > 0 && <RRButton variant="secondary" fullWidth onClick={() => setEvidenceViewViaje(viaje)}><Eye className="h-4 w-4" /> Ver evidencia ({contarFotos(viaje)} fotos)</RRButton>}
                   {viaje.status === "Conductor en camino" && <RRButton variant="dark" fullWidth onClick={() => onCambiarStatus(viaje.id, "Recolección en proceso", "Llegada al origen")}>✓ Confirmé llegada al origen</RRButton>}
                   {viaje.status === "Recolección en proceso" && <RRButton variant="dark" fullWidth onClick={() => setEvidenceViaje(viaje)}><Camera className="h-4 w-4" /> Cargar Evidencia Inicial</RRButton>}
                   {viaje.status === "Evidencia inicial pendiente" && <RRButton variant="dark" fullWidth onClick={() => onCambiarStatus(viaje.id, "Traslado en curso", "Traslado iniciado")}>🚗 Iniciar traslado</RRButton>}
@@ -937,6 +969,7 @@ function VijesView({ conductor, viajes, onAceptar, onRechazar, onCambiarStatus, 
           }}
         />
       )}
+      {evidenceViewViaje && <EvidenceViewerModal viaje={evidenceViewViaje} onClose={() => setEvidenceViewViaje(null)} />}
     </section>
   );
 }
@@ -1005,6 +1038,55 @@ function SettingsView({ conductor, onBack }: { conductor: ConductorPerfil | null
       </div>
     </section>
   );
+}
+
+// ─── EVIDENCE VIEWER ──────────────────────────────────────────────────────────
+function EvidenceViewerModal({ viaje, onClose }: { viaje: ViajeDB; onClose: () => void }) {
+  const [urls, setUrls] = useState<Record<string, string>>({})
+  const fotos = useMemo(() => (viaje.evidencias ?? []).flatMap(evidencia =>
+    CAMPOS_FOTO_EVIDENCIA.flatMap(([campo, label]) => {
+      const path = evidencia[campo]
+      return path ? [{ key: `${evidencia.id}-${campo}`, label, path }] : []
+    })
+  ), [viaje.evidencias])
+
+  useEffect(() => {
+    let activo = true
+    Promise.all(fotos.map(async foto => {
+      const { data } = await sb.storage.from("evidencias-viaje").createSignedUrl(foto.path, 3600)
+      return { key: foto.key, url: data?.signedUrl ?? null }
+    })).then(resultados => {
+      if (!activo) return
+      setUrls(Object.fromEntries(resultados.filter(r => r.url).map(r => [r.key, r.url as string])))
+    })
+    return () => { activo = false }
+  }, [fotos])
+
+  return (
+    <div className="absolute inset-0 z-50 flex flex-col bg-white">
+      <div className="flex items-center gap-3 border-b border-rr-gray200 p-4">
+        <button type="button" onClick={onClose}><X className="h-5 w-5 text-rr-gray500" /></button>
+        <div>
+          <h3 className="font-bold text-rr-black">Evidencia del viaje</h3>
+          <p className="text-xs text-rr-gray500">{viaje.folio}</p>
+        </div>
+      </div>
+      <div className="flex-1 overflow-y-auto p-4">
+        <div className="grid grid-cols-2 gap-3">
+          {fotos.map(foto => (
+            <a key={foto.key} href={urls[foto.key]} target="_blank" rel="noreferrer"
+              className="aspect-square overflow-hidden rounded-rrMd border border-rr-gray200 bg-rr-gray100 relative">
+              {urls[foto.key] ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={urls[foto.key]} alt={foto.label} className="h-full w-full object-cover" />
+              ) : <div className="h-full w-full animate-pulse bg-rr-gray100" />}
+              <span className="absolute inset-x-0 bottom-0 bg-black/60 px-2 py-1 text-center text-[10px] font-medium text-white">{foto.label}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
 }
 
 // ─── EVIDENCE MODAL ───────────────────────────────────────────────────────────
