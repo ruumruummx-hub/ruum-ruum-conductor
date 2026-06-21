@@ -1204,7 +1204,17 @@ function EvidenceModal({ viaje, conductorId, onClose, onSubmit }: {
       <div className="flex-1 overflow-y-auto p-4 space-y-5">
         <div>
           <RREvidenceGallery
-            items={slots.map(s => ({ ...s, previewUrl: previews[s.id], subiendo: subiendo[s.id] }))}
+            items={slots.map(s => ({
+              ...s,
+              previewUrl: previews[s.id],
+              subiendo: subiendo[s.id],
+              // Antes nunca se mandaba `completed`, así que la galería
+              // siempre mostraba el ícono de cámara (gris) para las 5
+              // casillas sin importar si la foto ya se había subido —
+              // el conductor no tenía forma de saber qué le faltaba
+              // realmente hasta darle a "Confirmar evidencia".
+              completed: Boolean(paths[s.id]),
+            }))}
             onSelect={abrirSelector}
           />
           {errorFotos && <p className="text-xs text-rr-danger font-medium mt-2">{errorFotos}</p>}
